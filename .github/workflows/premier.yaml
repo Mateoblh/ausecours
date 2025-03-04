@@ -8,13 +8,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    stops:
+    steps:
       - name: The First
         run: echo Hello
 
   test2:
     needs: [test]
     runs-on: ubuntu-latest
-    stops:
+    steps:
       - name: The Second
         run: echo Good Bye
