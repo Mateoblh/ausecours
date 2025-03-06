@@ -65,20 +65,41 @@ jobs:
           path: backend/coverge
           retention day: 3
 
-  # test2:
-  #   needs: [test]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: The Second
-  #       run: echo Good Bye
+  Frontend:
+    needs: [Backend]
+    runs-on: ubuntu-latest
+    defaults:
+      run: 
+        working-directory: frontend
 
-  # Biderie:
-  #   needs: [test2]
-  #   uses: ./.github/workflows/ghcr.yaml
-  #   secrets: inherit
-  #   permissions:
-  #     contents: read
-  #     packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Start Build backend
+        working-directory: backend
+        run: |
+          docker compose -f docker-compose.yml up -d
+          docker  ps -a 
+
+      - name: Sleep for 10 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '10s'
+
+      - name: test Backend Container
+        if: success()
+        run: curl http://127.0.0.1:23000
+
+  
+
+  Biderie:
+    if: ${{github.event_name == 'push'}}
+    uses: ./.github/workflows/ghcr.yaml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
 
   # Chelouterie:
     needs: [Biderie]
